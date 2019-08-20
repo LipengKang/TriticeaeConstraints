@@ -14,9 +14,9 @@ import utils.CLIInterface;
 
 /**
  *
- * @author feilu
+ * @author feilu & lipeng
  */
-public class CpScoreGo implements CLIInterface {
+public class AFScoreGo implements CLIInterface {
     Options options = new Options();
     HelpFormatter optionFormat = new HelpFormatter();
     String introduction = null;
@@ -29,7 +29,7 @@ public class CpScoreGo implements CLIInterface {
     String vcfFile =null;
     int kmerLength = 0;
     
-    public CpScoreGo (String[] args) {
+    public AFScoreGo (String[] args) {
         introduction = this.createIntroduction();
         this.createOptions();
         this.retrieveParameters (args);
@@ -72,11 +72,8 @@ public class CpScoreGo implements CLIInterface {
                 this.printIntroductionAndUsage();
                 return;
             }
-            else if (kmerLengthS.equals("32") || kmerLengthS.equals("16")) {
+            else  {
                 kmerLength = Integer.valueOf(kmerLengthS);
-            }
-            else {
-                this.printIntroductionAndUsage();
                 return;
             }
         }
@@ -85,11 +82,8 @@ public class CpScoreGo implements CLIInterface {
                 this.printIntroductionAndUsage();
                 return;
             }
-            else if (kmerLengthS.equals("32") || kmerLengthS.equals("16")) {
-                kmerLength = Integer.valueOf(kmerLengthS);
-            }
             else {
-                this.printIntroductionAndUsage();
+                kmerLength = Integer.valueOf(kmerLengthS);
                 return;
             }
         }
@@ -129,8 +123,7 @@ public class CpScoreGo implements CLIInterface {
         sb.append("\t\tjava -jar CpScoreProfiler.jar -m p -k 32 -r maizeAGPV4.fa -l maize_32mer.lib -a CML247.fa -v maizeAGPV4.vcf -o CML247_Cp\n");
         return sb.toString();
     }
-   
-    public static void main (String[] args) { 
-        new CpScoreGo (args);
+     public static void main(String[] args) {
+        new AFScoreGo (args);
     }
 }

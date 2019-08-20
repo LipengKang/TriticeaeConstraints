@@ -17,7 +17,8 @@ import lipengKang.analysis.KStringUtils;
 
 /**
  *
- * @author kanglipeng
+ * @author lipeng
+ * extract position and AF of all training datasets(VCFs)
  */
 public class VcfProfiler {
     public VcfProfiler(String vcf){
@@ -66,7 +67,7 @@ public class VcfProfiler {
                 Arrays.sort(AD);
                  DecimalFormat df=new DecimalFormat("0.000");
                 AFScore=Float.parseFloat(df.format((float)AD[AD.length - 1] / DP));
-                //chr name convert,1A->1,2A->2,1B->8,1D->15
+                //chrmosome name convert like 1A->1,2A->2,1B->8,1D->15
                 if (tem[0].endsWith("A")) {
                     chr = -1+Integer.valueOf(tem[0].substring(0, 1));
                 }
@@ -76,6 +77,7 @@ public class VcfProfiler {
                 if (tem[0].endsWith("D")) {
                     chr = 13 + Integer.valueOf(tem[0].substring(0, 1));
                 }
+                //0-based
                 AFScoreMaps[chr].put(Integer.valueOf(tem[1]).intValue()-1, AFScore);
             }
         } catch (Exception e) {
@@ -83,7 +85,6 @@ public class VcfProfiler {
                 e.printStackTrace();
         }
         System.out.println("AFScores calculation finished");
-        //HashIntIntMap(snpPos,1000*AF)
         return AFScoreMaps;
     }
 
