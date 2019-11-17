@@ -1282,10 +1282,10 @@ System.out.println(GERPList.get(j).size());
         this.samFile = pLineList.get(3);
 
     }
-
-    public static void main(String[] args) {
-        new wheatGeneQual();
-
-    }
+//
+//    public static void main(String[] args) {
+//        new wheatGeneQual();
+//
+//    }
 
 }

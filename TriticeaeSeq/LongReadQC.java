@@ -43,7 +43,7 @@ public class LongReadQC {
         int geneStartPos = 0;
         int geneEndPos = 0;
         int geneIndex = 0;
-        //hashmap: chrNum------>sort.geneRanges
+        //hashmap: chrNum------>quickSort.geneRanges
         HashIntIntMap[] geneRangesMap = new HashIntIntMap[7];
         for (int i = 0; i <= 6; i++) {
             geneRangesMap[i] = newMutableMap();
@@ -193,9 +193,9 @@ public class LongReadQC {
     
     
 
-    public static void main(String[] args) {
-
-        new LongReadQC();
-    }
+//    public static void main(String[] args) {
+//
+//        new LongReadQC();
+//    }
 
 }

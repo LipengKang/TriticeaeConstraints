@@ -34,7 +34,6 @@ int max=10000;
         Arrays.sort(randomPos);
         long pos = 1;
         int sampleIndex = 0;
-
         ArrayList<String> GERPsample = new ArrayList();
         BufferedReader br;
         BufferedWriter bw;
@@ -72,11 +71,11 @@ int max=10000;
         }
 
     }
-
-    public static void main(String[] args) {
-        String GERPDir = "/data1/home/lipeng/result/GERP/axt/D/gerp/wheatD.gerp++";
-        String outFile = "/data1/home/lipeng/result/GERP/axt/D/gerp/wheatD.sample.gerp++";
-        new sample(GERPDir, outFile);
-    }
+//
+//    public static void main(String[] args) {
+//        String GERPDir = "/data1/home/lipeng/result/GERP/axt/D/gerp/wheatD.gerp++";
+//        String outFile = "/data1/home/lipeng/result/GERP/axt/D/gerp/wheatD.sample.gerp++";
+//        new sample(GERPDir, outFile);
+//    }
 
 }

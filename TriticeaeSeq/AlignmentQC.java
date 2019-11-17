@@ -9,297 +9,215 @@ import gnu.trove.list.array.TIntArrayList;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import lipengKang.analysis.KStringUtils;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
 import utils.IOUtils;
 import utils.PStringUtils;
 
 /**
  *
- * @author kanglipeng
+ * @author kanglipeng map or alignment QC
  */
-//Triticeae PacBio Seq data QC
 public class AlignmentQC {
 
-    int sum = 0;
+    Options options = new Options();
+    String gffDir = null;
+    String mafDir = null;
+    String subGenome = null;
+    String annotation = null;
+     String function = null;
+    String temp = null;
+    String tem[] = null;
 
-    public AlignmentQC() {
-//this.orthOverlapRate();
-         this.geneCoverRate1(); //test maf cover rate of gene
-//this.geneCoverRate2();
-//this.geneCoverRate3();
-       // this.geneCoverRate4();
+    public AlignmentQC(String[] args) {
+        
+        this.createOptions();
+        this.retrieveParameters(args);
+        this.createIntroduction();
+        if(function.equals("getCoverRate")){
+        this.getCoverRate(gffDir, mafDir, annotation, subGenome);}
+         if(function.equals("diffMaf")){
+             this.diffMAF(gffDir, mafDir, subGenome);
+         }
     }
 
-    public void orthOverlapRate() {
-        String bed = "/data1/home/lipeng/software/mummer-4.0.0beta2/wheatA.barley.coords";
-        String maf = "/data1/home/lipeng/result/TriticeaeCM/align/A/wheatA.tu-ctg.split2.maf";
-        // String bed="/Users/kanglipeng/Desktop/iwgsc_refseqv1.1_genes_2017July06/test.coords";
-        //String maf="/Users/kanglipeng/Desktop/iwgsc_refseqv1.1_genes_2017July06/test.maf";
-        String temp = null;
-        String tem[] = null;
-        BufferedReader br1 = IOUtils.getTextReader(bed);
-        BufferedReader br2 = IOUtils.getTextReader(maf);
-        int[][] nucmerIndexArr = new int[7][800000000];
-
-        long nucmerCoverScore = 0;
-
+    //-----------------------------test maf cover rate of gene or exon or other annotations  ---------------------------------
+    public void getCoverRate(String gffDir, String mafDir, String annotation, String subGenome) {
+        BufferedReader brg = IOUtils.getTextReader(gffDir);
+        BufferedReader brm = IOUtils.getTextReader(mafDir);
+        int[][] AnnoIndexArr = new int[7][850000000];
+        int annoLength = 0;
+        int chr = 0;
         try {
-            temp = br1.readLine();
-            temp = br1.readLine();
-            temp = br1.readLine();
-            temp = br1.readLine();
-            while ((temp = br1.readLine()) != null) {
-                List<String> tList = PStringUtils.fastSplit(temp);
-                tem = tList.toArray(new String[tList.size()]);
-                for (int q = Integer.parseInt(tem[0]); q <= Integer.parseInt(tem[1]); q++) {
-                    nucmerIndexArr[Integer.valueOf(tem[7].substring(10)) - 1][q] = 1;
-
-                }
-            }
-            br1.close();
-            //  int geneCoverScore=0;
-            int[] overlapScore = new int[7];
-            long sumOverlapCover = 0;
-            long mafCoverScore = 0;
-            for (int i = 0; i < 7; i++) {
-                for (int j = 0; j < nucmerIndexArr[i].length; j++) {
-                    nucmerCoverScore = nucmerCoverScore + nucmerIndexArr[i][j];
-                }
-            }
-
-            while ((temp = br2.readLine()) != null) {
-                if (!temp.startsWith("s wheatA")) {
+            while ((temp = brg.readLine()) != null) {
+                if (temp.startsWith("#")) {
                     continue;
                 }
-                List<String> fList = KStringUtils.fastSplit(temp);
-                List<String> fListNew = new ArrayList<>();
-                for (int i = 0; i < fList.size(); i++) {
-                    if (fList.get(i) != null && !fList.get(i).equals("")) {
-                        fListNew.add(fList.get(i));
-                    }
-                }
-                tem = fListNew.toArray(new String[fListNew.size()]);
-
-                for (int p = Integer.parseInt(tem[2]) + 1; p <= Integer.parseInt(tem[2]) + Integer.parseInt(tem[3]); p++) {
-                    mafCoverScore++;
-                    if (nucmerIndexArr[Integer.valueOf(tem[1].substring(10)) - 1][p] != 1) {
-                        continue;
-                    }
-// geneCoverScore= geneCoverScore+geneIndexArr[Integer.valueOf(tem[1].substring(2))-1][p];
-                    overlapScore[Integer.valueOf(tem[1].substring(10)) - 1] = overlapScore[Integer.valueOf(tem[1].substring(10)) - 1] + 1;
-                }
-            }
-            br2.close();
-
-            for (int i : overlapScore) {
-                System.out.println("maf covers " + i + " bp chromosome genic region");
-                sumOverlapCover = sumOverlapCover + i;
-            }
-            System.out.println("maf covers " + sumOverlapCover + " bp overlap region");
-            //  System.out.println("maf covers " +geneCoverScore+" bp genic region");
-            //  System.out.println("maf covers " +geneCoverScore+" bp genic region");
-            System.out.println("nucmer covers " + nucmerCoverScore + " bp genomic region");
-            System.out.println("maf covers " + mafCoverScore + " bp genomic region");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    //-----------------------------test maf cover rate of gene  --------------------------
-    public void geneCoverRate1() {
-        String bed = "/data1/home/lipeng/database/genome/wheat/annotation/iwgsc_refseqv1.1_genes_2017July06/CNEfinderGene.gff3";
-        String maf = "/data1/home/lipeng/result/TriticeaeCM/pairWiseAlign/T_aestivum-A_tauschii.w3.sing.maf";
-        String temp = null;
-        String tem[] = null;
-        BufferedReader br1 = IOUtils.getTextReader(bed);
-        BufferedReader br2 = IOUtils.getTextReader(maf);
-        int[][] geneIndexArr = new int[7][800000000];
-int geneticLength=0;
-        try {
-            br1.readLine();
-            while ((temp = br1.readLine()) != null) {
                 List<String> tList = PStringUtils.fastSplit(temp);
                 tem = tList.toArray(new String[tList.size()]);
-                if(!tem[1].equals("chr1A"))continue;
-                for (int q = Integer.parseInt(tem[2]); q <= Integer.parseInt(tem[3]); q++) {
-                    geneIndexArr[Integer.parseInt(String.valueOf(tem[1].charAt(3))) - 1][q] = 1;
+                if (tem[0].endsWith(subGenome) && tem[2].equals(annotation)) {
+                    for (int q = Integer.parseInt(tem[3]) - 1; q <= Integer.parseInt(tem[4]) - 1; q++) {
+                        chr = Integer.parseInt(String.valueOf(tem[0].charAt(3))) - 1;
+                        AnnoIndexArr[chr][q] = 1;
+                    }
                 }
-                geneticLength =geneticLength+Integer.parseInt(tem[3])-Integer.parseInt(tem[2]);
             }
-            br1.close();
-            //  int geneCoverScore=0;
-            int[] geneCoverScore = new int[7];
-            long geneSumCover = 0;
+            brg.close();
             long coverScore = 0;
-
-            while ((temp = br2.readLine()) != null) {
-                if (!temp.startsWith("s Tr")) {
+            long CoverBps = 0;
+            while ((temp = brm.readLine()) != null) {
+                if (!temp.startsWith("s tr")) {
                     continue;
                 }
-                List<String> fList = KStringUtils.fastSplit(temp);
-                List<String> fListNew = new ArrayList<>();
-                for (int i = 0; i < fList.size(); i++) {
-                    if (fList.get(i) != null && !fList.get(i).equals("")) {
-                        fListNew.add(fList.get(i));
-                    }
-                }
-                tem = fListNew.toArray(new String[fListNew.size()]);
-
-                for (int p = Integer.parseInt(tem[2]) + 1; p <= Integer.parseInt(tem[2]) + Integer.parseInt(tem[3]); p++) {
+                tem = KStringUtils.mafSplit(temp);
+               // if(!tem[1].endsWith("A"))continue;
+                for (int p = Integer.parseInt(tem[2]); p <= Integer.parseInt(tem[2]) + Integer.parseInt(tem[3]) - 1; p++) {
                     coverScore++;
-                    if (geneIndexArr[Integer.valueOf(String.valueOf(tem[1].charAt(9)))- 1][p] != 1) {
-                        continue;
+                    // chr = Integer.parseInt(String.valueOf(tem[1].charAt(18))) - 1;
+                    chr = Integer.parseInt(String.valueOf(tem[1].charAt(10))) - 1;
+                    if (AnnoIndexArr[chr][p] == 1) {
+                        AnnoIndexArr[chr][p] = 2;
                     }
-// geneCoverScore= geneCoverScore+geneIndexArr[Integer.valueOf(tem[1].substring(2))-1][p];
-                    geneCoverScore[Integer.valueOf(String.valueOf(tem[1].charAt(9))) - 1] = geneCoverScore[Integer.valueOf(String.valueOf(tem[1].charAt(9))) - 1] + 1;
+
                 }
             }
-            br2.close();
-
-            for (int i : geneCoverScore) {
-                //System.out.println("maf covers " + i + " bp chromosome genic region");
-                geneSumCover = geneSumCover + i;
+            brm.close();
+            for (int j = 0; j < 7; j++) {
+                for (int i = 0; i < AnnoIndexArr[j].length; i++) {
+                    if (AnnoIndexArr[j][i] == 2) {
+                        CoverBps++;
+                        annoLength++;
+                    } else if (AnnoIndexArr[j][i] == 1) {
+                        annoLength++;
+                    }
+                }
             }
-            System.out.println("maf covers " + geneSumCover + " bp genic region");
-            System.out.println("maf covers " +100*geneSumCover/geneticLength+" % genic region");
+            DecimalFormat df = new DecimalFormat("0.0000");
+            System.out.println("Ref genome covers " + annoLength + " bp " + annotation + " region.");
+            System.out.println("input maf covers " + CoverBps + " bp " + annotation + " region.(" + 100 * Float.parseFloat(df.format((float) CoverBps / annoLength)) + "%)");
             System.out.println("maf covers " + coverScore + " bp genomic region");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void geneCoverRate2() {
-        String bed = "/data1/home/lipeng/result/PacBioAnalysis/maptest/10x.sam";
-        // String bed="/Users/kanglipeng/Desktop/iwgsc_refseqv1.1_genes_2017July06/test.sam";
-        String temp = null;
-        String tem[] = null;
-        BufferedReader br1 = IOUtils.getTextReader(bed);
-        int[][] genomeIndexArr = new int[7][760000000];
-
+    public void diffMAF(String gffDir, String mafDir, String subGenome) {
+        BufferedReader brg = IOUtils.getTextReader(gffDir);//gffDir points to mafDir now 
+        BufferedReader brm = IOUtils.getTextReader(mafDir);
+        int[][] hitsMap = new int[7][850000000];
+        int[][] hitsMap1 = new int[7][850000000];
+        int hitsLength = 0;
+        int chrIndex = 0;
         try {
-            while ((temp = br1.readLine()) != null) {
-                List<String> tList = PStringUtils.fastSplit(temp);
-                tem = tList.toArray(new String[tList.size()]);
-                if (!tem[2].startsWith("Tu")) {
+            while ((temp = brg.readLine()) != null) {
+                if (!temp.startsWith("s tr")) {
                     continue;
                 }
-                for (int q = Integer.parseInt(tem[3]); q <= Integer.parseInt(tem[3]) + tem[9].length() - 1; q++) {
-                    genomeIndexArr[Integer.valueOf(tem[2].substring(2)) - 1][q] = 1;
+                tem = KStringUtils.mafSplit(temp);
+               // if (tem[1].endsWith(subGenome)) {
+                    for (int q = Integer.parseInt(tem[2]); q <= Integer.parseInt(tem[2]) + Integer.parseInt(tem[3]) - 1; q++) {
+                        chrIndex = Integer.parseInt(String.valueOf(tem[1].charAt(10))) - 1;
+                        hitsMap[chrIndex][q] = 1;
+                //   }
                 }
             }
-            br1.close();
-            long coverLength = 0;
-            for (int i = 0; i < 7; i++) {
-                for (int j = 0; j < genomeIndexArr[i].length; j++) {
-                    coverLength = coverLength + genomeIndexArr[i][j];
+            brg.close();
+            long coverScore = 0;
+            long CoverBps = 0;
+            while ((temp = brm.readLine()) != null) {
+                if (!temp.startsWith("s tr")) {
+                    continue;
                 }
+                tem = KStringUtils.mafSplit(temp);
+                //second maf may contain only defined subgenome
+                for (int p = Integer.parseInt(tem[2]); p <= Integer.parseInt(tem[2]) + Integer.parseInt(tem[3]) - 1; p++) {
+                    coverScore++;
+                    chrIndex = Integer.parseInt(String.valueOf(tem[1].charAt(10))) - 1;
+                      hitsMap1[chrIndex][p] = 3;
+                    if (hitsMap[chrIndex][p] == 1) {
+                        hitsMap[chrIndex][p] = 2;
+                    }
+
+                }
+            }
+            brm.close();
+             for (int j = 0; j < 7; j++) {
+                 int hitsLength1=0;
+                for (int i = 0; i < hitsMap1[j].length; i++) {
+                    if (hitsMap1[j][i] == 3) {  
+                        hitsLength1++;
+                    } 
+                }
+                System.out.println(hitsLength1);
             }
 
-            System.out.println("maf covers " + coverLength + " bp genomic region");
+            for (int j = 0; j < 7; j++) {
+                for (int i = 0; i < hitsMap[j].length; i++) {
+                    if (hitsMap[j][i] == 2) {
+                        CoverBps++;
+                        hitsLength++;
+                    } else if (hitsMap[j][i] == 1) {
+                        hitsLength++;
+                    }
+                }
+                System.out.println(CoverBps);
+                
+            }
+            DecimalFormat df = new DecimalFormat("0.0000");
+            System.out.println("maf1:"+mafDir);
+            System.out.println("maf2:"+gffDir);
+            System.out.println("Ref maf covers " + hitsLength + " bp " + subGenome + " genome.");
+            System.out.println("last maf covers " + coverScore + " bp " + subGenome + " genome.");
+            System.out.println("overlapped block covers " + CoverBps + " bp  region.(" + 100 * Float.parseFloat(df.format((float) CoverBps / hitsLength)) + "%)");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void createOptions() {
+        options = new Options();
+        options.addOption("m", true, "maf path");
+        options.addOption("g", true, "gff3 Path");
+        options.addOption("a", true, "annotaion type of checking. eg:check exon or gene aligned rates");
+        options.addOption("s", true, "sub-Genome. eg:A");
+        options.addOption("f", true, "function. eg:diffMAF");
+    }
+
+    public void retrieveParameters(String[] args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine line = parser.parse(options, args);
+            mafDir = line.getOptionValue("m");
+            gffDir = line.getOptionValue("g");
+            annotation = line.getOptionValue("a");
+            subGenome = line.getOptionValue("s");
+            function =line.getOptionValue("f");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void geneCoverRate3() {
-
-        String maf = "/data1/home/lipeng/result/PacBioAnalysis/homo6/RAC.postmask.maf";
-        String temp = null;
-        String tem[] = null;
-
-        BufferedReader br1 = IOUtils.getTextReader(maf);
-
-        int[] geneIndexArr = new int[258957000];
-        String bed = "/data1/home/lipeng/software/CNEFinder/Experiments/Files/hg38_genes";
-
-        BufferedReader br2 = IOUtils.getTextReader(bed);
-
-        try {
-            while ((temp = br2.readLine()) != null) {
-                List<String> tList = PStringUtils.fastSplit(temp);
-                tem = tList.toArray(new String[tList.size()]);
-                if (!tem[1].equals("1")) {
-                    continue;
-                }
-                for (int q = Integer.parseInt(tem[2]); q <= Integer.parseInt(tem[3]); q++) {
-                    geneIndexArr[q] = 1;
-                }
-            }
-            br2.close();
-            int geneCoverBps = 0;
-            while ((temp = br1.readLine()) != null) {
-                if (!temp.startsWith("s chr")) {
-                    continue;
-                }
-                List<String> fList = KStringUtils.fastSplit(temp);
-                List<String> fListNew = new ArrayList<>();
-                for (int i = 0; i < fList.size(); i++) {
-                    if (fList.get(i) != null && !fList.get(i).equals("")) {
-                        fListNew.add(fList.get(i));
-                    }
-                }
-                tem = fListNew.toArray(new String[fListNew.size()]);
-
-                for (int p = Integer.parseInt(tem[2]) + 1; p <= Integer.parseInt(tem[2]) + Integer.parseInt(tem[3]); p++) {
-                    if (geneIndexArr[p] != 1) {
-                        continue;
-                    }
-// geneCoverScore= geneCoverScore+geneIndexArr[Integer.valueOf(tem[1].substring(2))-1][p];
-                    geneCoverBps = geneCoverBps + 1;
-//geneIndexArr[p]=1;
-                }
-            }
-            br1.close();
-            int geneBps = 0;
-            for (int i : geneIndexArr) {
-                geneBps = geneBps + i;
-            }
-//   int coverBps=0;
-//    for (int i: geneIndexArr){
-//    coverBps=coverBps+i;
-//    }
-//    System.out.println("maf covers " +coverBps+" bp chr1");
-            System.out.println("maf covers " + geneCoverBps + " bp chr1 gene");
-            System.out.println("chr1 owns " + geneBps + " bp gene region");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void geneCoverRate4() {
-        String bed = "/data1/home/lipeng/result/PacBioAnalysis/homo6/aln.sam";
-        // String bed="/Users/kanglipeng/Desktop/iwgsc_refseqv1.1_genes_2017July06/test.sam";
-        String temp = null;
-        String tem[] = null;
-        BufferedReader br1 = IOUtils.getTextReader(bed);
-        int[] genomeIndexArr = new int[258956422];
-
-        try {
-            while ((temp = br1.readLine()) != null) {
-                List<String> tList = PStringUtils.fastSplit(temp);
-                tem = tList.toArray(new String[tList.size()]);
-
-                for (int q = Integer.parseInt(tem[7]); q <= Integer.parseInt(tem[8]); q++) {
-                    genomeIndexArr[q] = 1;
-                }
-            }
-            br1.close();
-            long coverLength = 0;
-
-            for (int j = 0; j < genomeIndexArr.length; j++) {
-                coverLength = coverLength + genomeIndexArr[j];
-            }
-
-            System.out.println("paf covers " + coverLength + " bp genomic region");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void createIntroduction() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("The program AlignmentQC.jar is designed to calculate alignment cover rate.\n");
+        sb.append("\nCommand line example:\n");
+        sb.append("getCoverRate: java -Xms10g -Xmx20g -jar AlignmentQC.jar -f getCoverRate -m test.maf -g test.gff3 -a exon -s A\n");
+         sb.append("diffMaf: java -Xms10g -Xmx20g -jar AlignmentQC.jar -f diffMaf -m last.maf -g Ref.maf -s A\n");
+        sb.append("\nAttention! " + "\n" + "1.maf must be one to one alignment (2-split or single_cov2 or chainNet) \n2.gff3 must contains only the longest transcripts(not affect gene cover rate) ");
+        sb.append("\nResult of " + mafDir + ":\n");
+        System.out.print(sb.toString());
     }
 
     public static void main(String[] args) {
-        new AlignmentQC();
+        new AlignmentQC(args);
     }
 }
