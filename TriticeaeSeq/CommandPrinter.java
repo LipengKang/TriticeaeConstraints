@@ -45,10 +45,10 @@ for(String j: subGenome){
 //System.out.println("bedtools merge -i "+i+j+".flt.bed >"+i+j+".flt.beds");  
 //System.out.println("rm "+i+j+".flt.bed");  
 //System.out.println("mv "+i+j+".flt.beds "+i+j+".flt.bed");  
-System.out.println("java -Xms400g -Xmx400g -jar gerpReformat.jar -f /data2/lipeng/msa/gerp/"+i+j+".flt.bed -m /data2/lipeng/msa/gerp/"+i+j+".sort.maf.gerp -o /data2/lipeng/msa/gerp/"+i+j+".gerp.wig -g "+j);
-
+//System.out.println("java -Xms400g -Xmx400g -jar gerpReformat.jar -f /data2/lipeng/msa/gerp/"+i+j+".flt.bed -m /data2/lipeng/msa/gerp/"+i+j+".sort.maf.gerp -o /data2/lipeng/msa/gerp/"+i+j+".gerp.wig -g "+j);
+System.out.println("java -Xms200g -Xmx200g -jar PlantGenetics.jar -g /data2/lipeng/msa/gerp/"+i+j+".gerp.wig");
      }}
-     }  
+     }   
 }
 //(((orind,orniv),(orruf,orjap)),(orbar,orgla))))))leper)))
 //(((((phedu,(((hovul,hospo),(aetau,(traesA,trura))),brdis)),(orbra,((orpun,(ormer,(orlon,(orglu,(((orind,orniv),(orruf,orjap)),(orbar,orgla)))))),leper)))),(((sobic,zemay),(eccru,(seita,(pahal,pavir)))),((ercur,ertef),ortho))),ancom)

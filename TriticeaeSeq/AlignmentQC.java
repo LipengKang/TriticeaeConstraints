@@ -36,73 +36,37 @@ public class AlignmentQC {
     String temp = null;
     String tem[] = null;
 
-    public AlignmentQC(String[] args) {
-        
+    public AlignmentQC(String[] args) {   
         this.createOptions();
         this.retrieveParameters(args);
-        this.createIntroduction();
-        if(function.equals("getCoverRate")){
-        this.getCoverRate(gffDir, mafDir, annotation, subGenome);}
-         if(function.equals("diffMaf")){
-             this.diffMAF(gffDir, mafDir, subGenome);
-         }
+      //  this.createIntroduction();
+        this.parseDensity(gffDir);
+
+           //  this.diffMAF(gffDir, mafDir, subGenome);
+         
     }
 
     //-----------------------------test maf cover rate of gene or exon or other annotations  ---------------------------------
-    public void getCoverRate(String gffDir, String mafDir, String annotation, String subGenome) {
+    public void parseDensity(String gffDir) {
+        int rangeMax=5;int rangeMin=-5;int binNum=20;
         BufferedReader brg = IOUtils.getTextReader(gffDir);
-        BufferedReader brm = IOUtils.getTextReader(mafDir);
-        int[][] AnnoIndexArr = new int[7][850000000];
-        int annoLength = 0;
-        int chr = 0;
-        try {
-            while ((temp = brg.readLine()) != null) {
-                if (temp.startsWith("#")) {
-                    continue;
-                }
-                List<String> tList = PStringUtils.fastSplit(temp);
-                tem = tList.toArray(new String[tList.size()]);
-                if (tem[0].endsWith(subGenome) && tem[2].equals(annotation)) {
-                    for (int q = Integer.parseInt(tem[3]) - 1; q <= Integer.parseInt(tem[4]) - 1; q++) {
-                        chr = Integer.parseInt(String.valueOf(tem[0].charAt(3))) - 1;
-                        AnnoIndexArr[chr][q] = 1;
-                    }
-                }
-            }
-            brg.close();
-            long coverScore = 0;
-            long CoverBps = 0;
-            while ((temp = brm.readLine()) != null) {
-                if (!temp.startsWith("s tr")) {
-                    continue;
-                }
-                tem = KStringUtils.mafSplit(temp);
-               // if(!tem[1].endsWith("A"))continue;
-                for (int p = Integer.parseInt(tem[2]); p <= Integer.parseInt(tem[2]) + Integer.parseInt(tem[3]) - 1; p++) {
-                    coverScore++;
-                    // chr = Integer.parseInt(String.valueOf(tem[1].charAt(18))) - 1;
-                    chr = Integer.parseInt(String.valueOf(tem[1].charAt(10))) - 1;
-                    if (AnnoIndexArr[chr][p] == 1) {
-                        AnnoIndexArr[chr][p] = 2;
-                    }
+        ArrayList<Float>data=new ArrayList<>();
+          try {
+       while ((temp = brg.readLine()) != null) {
+           if(temp.startsWith("f")) continue;
+           data.add(Float.parseFloat(temp));
+       }
+       Float []dataFrame = data.toArray(new Float[data.size()]);
+        float []frame=new float[data.size()];
+         for(int i = 0; i < dataFrame.length; i++){
+    frame[i] = dataFrame[i].floatValue();
+}
+      double[][]DPMatrix= CsvProvider.statsFloatPD(frame, rangeMin,rangeMax,binNum);
+       System.out.println(gffDir);
+      for(int i=0;i<binNum;i++){
+       System.out.println(DPMatrix[i][0]+"\t"+DPMatrix[i][1]);
+      }
 
-                }
-            }
-            brm.close();
-            for (int j = 0; j < 7; j++) {
-                for (int i = 0; i < AnnoIndexArr[j].length; i++) {
-                    if (AnnoIndexArr[j][i] == 2) {
-                        CoverBps++;
-                        annoLength++;
-                    } else if (AnnoIndexArr[j][i] == 1) {
-                        annoLength++;
-                    }
-                }
-            }
-            DecimalFormat df = new DecimalFormat("0.0000");
-            System.out.println("Ref genome covers " + annoLength + " bp " + annotation + " region.");
-            System.out.println("input maf covers " + CoverBps + " bp " + annotation + " region.(" + 100 * Float.parseFloat(df.format((float) CoverBps / annoLength)) + "%)");
-            System.out.println("maf covers " + coverScore + " bp genomic region");
         } catch (Exception e) {
             e.printStackTrace();
         }
