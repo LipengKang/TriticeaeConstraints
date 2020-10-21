@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lipengKang.analysis.KStringUtils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -48,9 +47,9 @@ public class FormatConvertTools {
         //this.dfe(mafDir, outDir,subGenome);
         //  this.focal(mafDir, outDir,subGenome);
         //   this.mafToFa();
-        this.mafTophy();
+     //   this.mafTophy();
         //this.gerpReformat();
-        //this.mafRevise(mafDir,outDir,specie,faiDir);
+        this.mafRevise(mafDir,outDir,specie,faiDir);
         //  this.tata(mafDir, outDir);
     }
 //---------------------msa to non-deletion msa--------------------------------------------------
@@ -134,6 +133,11 @@ public class FormatConvertTools {
         String out = "/data2/lipeng/msa/multiz/a.4d.fa";
         BufferedReader br = YaoIOUtils.getTextReader(maf);
         BufferedWriter bw = YaoIOUtils.getTextWriter(out);
+         if (maf.endsWith("gz")) {
+            br = YaoIOUtils.getTextGzipReader(maf);
+        } else {
+            br = YaoIOUtils.getTextReader(maf);
+        }
 
         String[] species = {"traes", "aetau", "trura", "hospo", "hovul", "brdis", "phedu", "leper", "orbra", "orpun", "ormer", "orlon", "orglu", "orbar", "orgla", "orniv", "orind", "orruf", "orjap", "ertef", "ortho", "sobic", "zemay", "seita", "pahal", "pavir"};
         HashMap<String, String> blockInfo = new HashMap();
@@ -278,11 +282,19 @@ public class FormatConvertTools {
 //a score=278 mismap=2.38e-06
 //s traesA.chr3                100018229 74 + 750843639 atGGTCACCTTGAGGTAGGTGTCGACGGCGCGGTAGAGCGCGTCgtcggcggcgCGCGcgtgggcggGCAcagc
 //s leper.chr1:3115495-3195902     80333 74 -     80407 ACGCTGACCTTGAGGTAGGTGTCGACGGCGCGGTAGAGCCCATCATCGGCGGGCCGCGCGTGGGCCGGCACGGC 
+//##s leper.chr1:x1-x2  x3  x4  -   x5  .....
+    //lper.chr1 realChrlength-x2+x3    x4  - readChrLength  ......   
+
     public void mafRevise(String mafDir, String outDir, String specie, String faiDir) {
-        BufferedReader brm = YaoIOUtils.getTextReader(mafDir);
+      BufferedReader brm ;
         BufferedReader brf = YaoIOUtils.getTextReader(faiDir);
         BufferedWriter bw = YaoIOUtils.getTextWriter(outDir);
         HashMap<String, Integer> chrInfo = new HashMap();
+             if (mafDir.endsWith("gz")) {
+            brm = YaoIOUtils.getTextGzipReader(mafDir);
+        } else {
+            brm = YaoIOUtils.getTextReader(mafDir);
+        }
         try {
             while ((temp = brf.readLine()) != null) {
                 chrInfo.put(KStringUtils.fastSplitdel(temp)[0], Integer.valueOf(KStringUtils.fastSplitdel(temp)[1]));
@@ -294,7 +306,12 @@ public class FormatConvertTools {
                     String[] info = KStringUtils.fastSplitColon(tem[1]);
                     bw.write(tem[0] + "\t");
                     bw.write(info[0] + "\t");
+                    if(tem[4].equals("-")){
+                    bw.write(String.valueOf(Integer.valueOf(chrInfo.get(info[0]))-Integer.valueOf(KStringUtils.fastSplitStrigula(info[1])[1]) + Integer.valueOf(tem[2])) + "\t");
+                    }
+                    if(tem[4].equals("+")){
                     bw.write(String.valueOf(Integer.valueOf(KStringUtils.fastSplitStrigula(info[1])[0]) + Integer.valueOf(tem[2])) + "\t");
+                    }
                     bw.write(tem[3] + "\t");
                     bw.write(tem[4] + "\t");
                     Integer m = chrInfo.get(info[0]);

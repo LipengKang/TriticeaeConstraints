@@ -16,8 +16,10 @@ import utils.CLIInterface;
 
 /**
  *
- * @author feilu & lipeng
+ * @author lipeng
+ * 
  */
+
 public class CDTSScoreGo implements CLIInterface {
     Options options = new Options();
     HelpFormatter optionFormat = new HelpFormatter();
@@ -126,7 +128,7 @@ public class CDTSScoreGo implements CLIInterface {
     @Override
     public void createOptions () {
         options = new Options();
-        options.addOption("m", true, "Analysis mode. Two modes are available, building reference kmer library (b option) and profiling CpScore (p option). e.g. -m b");
+        options.addOption("m", true, "Analysis mode. Two modes are available, building reference kmer library (b option) and profiling CDTS score (p option). e.g. -m b");
         options.addOption("k", true, "Kmer length. Only 32 and 16 are supported. e.g. -k 32");
         options.addOption("w", true, "Constraint elements window size when scan CDTS score. e.g. -w 550");
         options.addOption("s", true, "window slide every stropSize bp. e.g. -s 10");
@@ -138,7 +140,7 @@ public class CDTSScoreGo implements CLIInterface {
     
     public String createIntroduction () {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nThe program CDTSScoreProfiler.jar is designed to sonstruct a constraint map of a given genome. ");
+        sb.append("\nThe program CDTSScoreProfiler.jar is designed to construct a constraint map using a given genome. ");
         sb.append("It has 2 analysis modes. The first is to build kmer library from the reference genome. The second is to calculate the CDTS Score from vcf.\n\n");
         sb.append("Command line example:\n\n");
         sb.append("\t1. Build kmer library from reference genome. The reference genome should be in Fasta format. The header must be the chromosome number. e.g. chromosome 1 is >1\n");

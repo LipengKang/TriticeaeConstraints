@@ -315,7 +315,6 @@ expectedCEScoreMaps[chr].put(j + kmerLength / 2 - 1, aver);
 //        referenceGenomeFileS = "/Users/feilu/Documents/analysisL/pipelineTest/cpScore/maize_chr12.fa";
 // here scan the same genome to add CDTS scores
 //        VcfProfiler v = new VcfProfiler(vcfFile, f);
-
         this.AFScoreMaps = CDTSScoreProfiler.VcfProfiler.calculateAF(vcfFile, f);
         HashByteByteMap ascIIByteMap = BaseEncoder.getAscIIByteMap();
         System.out.println("Start counting kmers in genome.");

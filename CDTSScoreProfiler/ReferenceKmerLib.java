@@ -33,7 +33,7 @@ public class ReferenceKmerLib {
     void createKmerSet(String referenceGenomeFileS) {
         FastaByte f = new FastaByte(referenceGenomeFileS);
         HashByteByteMap ascIIByteMap = BaseEncoder.getAscIIByteMap();
-        //getAscIIByteMap function convert ATCG to 0123,and others to 4，maybe aim to create new ATCG specific ASCII code 
+//getAscIIByteMap function convert ATCG to 0123,and others to 4，maybe aim to create new ATCG specific ASCII code 
         System.out.println("Building kmer library from reference...");
         System.out.println("KmerLength = " + String.valueOf(kmerLength) + " bp");
         long start = System.nanoTime();
@@ -42,12 +42,12 @@ public class ReferenceKmerLib {
         } else if (kmerLength > 16) {
             this.longKmerMaps = this.getLongKmerMaps(f, ascIIByteMap);
         }
-       // System.out.println(Benchmark.getTimeSpanSeconds(start) + " seconds used to build Kmer library");
+ // System.out.println(Benchmark.getTimeSpanSeconds(start) + " seconds used to build Kmer library");
     }
 
     void writeBinaryFile(String libFileS) {
-//binary lib file  format       
-//kmerLength,barcodeLength,kmerBin size,int or long kmers
+//kmer binary library file format       
+//kmerLength, barcodeLength, kmerBin size,int(16) or long(32) kmers
         try {
             DataOutputStream dos = IOUtils.getBinaryWriter(libFileS);
             dos.writeInt(kmerLength);

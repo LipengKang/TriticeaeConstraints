@@ -15,7 +15,6 @@ import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import lipengKang.analysis.KStringUtils;
 import static lipengKang.analysis.RandomArray.randomArray;
 import utils.IOUtils;
 import utils.PStringUtils;

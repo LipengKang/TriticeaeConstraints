@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import lipengKang.analysis.KStringUtils;
+import TriticeaeSeq.KStringUtils;
 
 /**
  *
@@ -33,7 +33,7 @@ public class VcfProfiler {
         String temp = null;
         String[] tem = null;
         String[] infoTem = null;
-        int DP = 0;
+      //  int DP = 0;
         String ADString[] = null;
         float AFScore = 0f;
         int chr = 0;
@@ -78,16 +78,20 @@ list.add(files[i].getAbsolutePath());
                 List<String> sList = KStringUtils.fastSplitSemicolon(tem[7]);
                 infoTem = sList.toArray(new String[sList.size()]);
                 //AFScore calculate
-                DP = Integer.valueOf(infoTem[0].substring(3));
-                List<String> cList = KStringUtils.fastSplitComma(infoTem[1].substring(3));
-                ADString = cList.toArray(new String[cList.size()]);
-                int AD[] = new int[ADString.length];
-                for (int i = 0; i < ADString.length; i++) {
-                    AD[i] = Integer.valueOf(ADString[i]).intValue();
-                }
-                Arrays.sort(AD);
-                 DecimalFormat df=new DecimalFormat("0.000");
-                AFScore=Float.parseFloat(df.format((float)AD[AD.length - 1] / DP));
+             //   DP = Integer.valueOf(infoTem[0].substring(3));
+             //    ADString = KStringUtils.fastSplitComma(infoTem[1].substring(3));
+               
+//                int AD[] = new int[ADString.length];
+//                for (int i = 0; i < ADString.length; i++) {
+//                    AD[i] = Integer.valueOf(ADString[i]).intValue();
+
+//extract MAF
+AFScore = Float.parseFloat(infoTem[6].substring(4));
+
+            //    }
+              //  Arrays.sort(AD);
+           //      DecimalFormat df=new DecimalFormat("0.000");
+          //      AFScore=Float.parseFloat(df.format((float)AD[AD.length - 1] / DP));
                 //chrmosome name convert like 1A->1,2A->2,1B->8,1D->15
 //                if (tem[0].endsWith("A")) {
 //                    chr = -1+Integer.valueOf(tem[0].substring(0, 1));

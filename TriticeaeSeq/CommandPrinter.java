@@ -18,91 +18,31 @@ public class CommandPrinter {
 //    ((hovul:0.00315531931731526452,hospo:0.00291301039210765597):0.05739904630277179592,(aetau:0.02889020081603003998,(traesA:0.00385802966340279994,trura:0.00434378444463454777):0.02797814516990456898):0.02394215872622542166)
 
     public static void main(String[] args) {
-        try {
+//        try {
             //create blocks for all chr
             int chr=7;
             String genome="D";
-            for (int j =1 ; j <= 64; j++) {
-                String outDir = "/Users/kanglipeng/Desktop/1A/" + j + ".sh";                     
-                BufferedWriter bw = IOUtils.getTextWriter(outDir);
-                //block num
-                int start = 2000*(j-1)+1;
-                int end = j*2000;
-                bw.write("for i in {" + start + ".." + end + "};do echo $i >$i.bed;done");
-                bw.newLine();
-                //question
-                bw.write("for i in {" + start + ".." + end + "};do awk '{print \"chr"+chr+"\"\"\\t\"$1*5000-5000\"\\t\"$1*5000+10000}' $i.bed >$i.beds ;done");
-                bw.newLine();
-                
-                bw.write("grep 'chr"+chr+"' ../"+genome+"/final/"+genome+".pns.bed  >"+chr+genome+".bed");bw.newLine();
-                for (int i = start; i <= end-2; i++) {
-                    //  System.out.println("bedtools intersect -a "+i+".bed -b 1A.neutral.bed > "+i+".block.bed");
-//         System.out.println("awk '{if(($3-$2)>=100){print$0}}' "+i+".block.bed >"+i+".block.beds");
-//         //find . -size 0 -delete 
-                    //System.out.println("nohup phyloP --mode CONACC --wig-scores A.10k.mod ../gerp/"+i+"A.sort.maf >"+i+"A.phyloP.wig &");
-
-                    bw.write("bedtools intersect -a " + i + ".beds -b ../"+genome+"/final/"+chr+genome+"/"+j+".bed  >" + i + ".bed");
-                    bw.newLine();
-                    // bw.write("mv "+i+".beds "+i+".bed");bw.newLine(); 
-                   // bw.newLine();
-                    bw.write("awk '{sum+=($3-$2)};END{print sum}' " + i + ".bed |awk '{if($1<100){cmd=\"rm " + i + ".bed\"; print cmd; system(cmd)}}'");
-                    bw.newLine();
-                   // bw.write("awk '{sum+=($3-$2)};END{print sum}' " + i + ".bed |awk '{if($1<100){cmd=\"rm " + i + ".beds\"; print cmd; system(cmd)}}'");
-                   // bw.newLine();
-                    //1.flt.maf
-
-                    bw.write("mafsInRegion " + i + ".bed " + i + ".maf ../asGenome/"+genome+"/split/"+chr+genome+"/"+j+".maf");
-                    bw.newLine();
-                    //                  here need change
-                    bw.write("phyloFit --tree \"(((traesD,aetau),trura),hovul)\" --subst-mod REV --out-root " + i + " " + i + ".maf");
-                    bw.newLine();
-                      bw.write("grep 'aetau' " + i + ".mod >"+i+".mods");
-                                          bw.newLine();
-                    //traesA and trura and 1A
-                    // bw.write("all_dists -m "+i+".mod | awk '/traesA/{print$0}' | awk '/trura/{print$3}' >>1A.lemda");bw.newLine();
-                    //                                                                                                                 here need change
-                    bw.write("grep 'aetau' " + i + ".mods |sed 's/(/ /g'|sed 's/)/ /g'|sed 's/;/ /g'|sed 's/,/ /g'|xargs -n1|awk '/traesD/{print substr($1,8,length($1))}' >>" + j + ".lambda");
-                    bw.newLine();
-                    bw.write("rm " + i + ".beds");
-                    bw.newLine();
-                    bw.write("rm " + i + ".maf");
-                    bw.newLine();
-                      bw.write("rm " + i + ".bed");
-                    bw.newLine();
-                    bw.write("mv " + i + ".mods "+i+".mod");
-                    bw.newLine();
-                }
-                      for (int i = end-1; i <= end; i++) {
-                        bw.write("bedtools intersect -a " + i + ".beds -b "+chr+genome+".bed >" + i + ".bed");
-                    bw.newLine();
-                    bw.write("awk '{sum+=($3-$2)};END{print sum}' " + i + ".bed |awk '{if($1<100){cmd=\"rm " + i + ".bed\"; print cmd; system(cmd)}}'");
-                    bw.newLine();
-                    bw.write("mafsInRegion " + i + ".bed " + i + ".maf ../asGenome/"+genome+"/split/"+genome+".maf");
-                    bw.newLine();
-                    bw.write("phyloFit --tree \"(((traesD,aetau),trura),hovul)\" --subst-mod REV --out-root " + i + " " + i + ".maf");
-                    bw.newLine();
-                    
-                         bw.write("grep 'aetau' " + i + ".mod >"+i+".mods");
-                       bw.newLine();
-                    
-                    bw.write("grep 'aetau' " + i + ".mod |sed 's/(/ /g'|sed 's/)/ /g'|sed 's/;/ /g'|sed 's/,/ /g'|xargs -n1|awk '/traesD/{print substr($1,8,length($1))}' >>" + j + ".lambda");
-                    bw.newLine();
-                    bw.write("rm " + i + ".beds");
-                    bw.newLine();
-                    bw.write("rm " + i + ".maf");
-                    bw.newLine();
-                    bw.write("rm " + i + ".bed");
-                    bw.newLine();
-                    bw.write("mv " + i + ".mods "+i+".mod");
-                    bw.newLine();
+//            for (int j =1 ; j <= 9; j++) {
+//                System.out.println("zcat /data1/publicData/wheat/genotype/VMapII/VMap2.1/chr00"+j+"_vmap2.1.vcf.gz |tail -n +22|awk '{split($8,a,\";\");print \"chr"+j+"\"\"\\t\"$2-1\"\\t\"$2\"\\t\"$4\"\\t\"$5\"\\t\"substr(a[7],5,length(a[7]))}' >chr"+j+"_vmap2.1.vcf.bed");
+//                
+////                    bw.newLine();j
+//                      }
+             for (int j =1 ; j <= 7; j++) {
+                System.out.println("awk 'BEGIN{FS=\"\\t\";OFS=\"\\t\"}{if($1==\""+j+"A\")$1=\"chr\"substr($1,1,1);print $0 }' vmap2.1.vcf.bed >"+j+"A_vmap2.1.vcf.bed");
                       }
-                bw.flush();
-                bw.close();
+             
+
+              // System.out.println("cat *_vmap2.1.vcf.bed|awk '{if($1==\"chr1\")print \"1A\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}' |awk '{if($1==\"chr2\")print \"1A\"\"\\t\"$2+471304005\"\\t\"$3+471304005\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr3\")print \"1B\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8; else print $0}'|awk '{if($1==\"chr4\")print \"1B\"\"\\t\"$2+438720154\"\\t\"$3+438720154\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr5\")print \"1D\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr6\")print \"1D\"\"\\t\"$2+452179604\"\\t\"$3+452179604\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr7\")print \"2A\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}' |awk '{if($1==\"chr8\")print \"2A\"\"\\t\"$2+462376173\"\\t\"$3+462376173\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr9\")print \"2B\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8; else print $0}'|awk '{if($1==\"chr10\")print \"2B\"\"\\t\"$2+453218924\"\\t\"$3+453218924\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr11\")print \"2D\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr12\")print \"2D\"\"\\t\"$2+462216879\"\\t\"$3+462216879\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr13\")print \"3A\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}' |awk '{if($1==\"chr14\")print \"3A\"\"\\t\"$2+454103970\"\\t\"$3+454103970\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr15\")print \"3B\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8; else print $0}'|awk '{if($1==\"chr16\")print \"3B\"\"\\t\"$2+448155269\"\\t\"$3+448155269\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr17\")print \"3D\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr18\")print \"3D\"\"\\t\"$2+476235359\"\\t\"$3+476235359\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr19\")print \"4A\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}' |awk '{if($1==\"chr20\")print \"4A\"\"\\t\"$2+452555092\"\\t\"$3+452555092\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr21\")print \"4B\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8; else print $0}'|awk '{if($1==\"chr22\")print \"4B\"\"\\t\"$2+451014251\"\\t\"$3+451014251\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr23\")print \"4D\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr24\")print \"4D\"\"\\t\"$2+451004620\"\\t\"$3+451004620\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr25\")print \"5A\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}' |awk '{if($1==\"chr26\")print \"5A\"\"\\t\"$2+453230519\"\\t\"$3+453230519\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr27\")print \"5B\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8; else print $0}'|awk '{if($1==\"chr28\")print \"5B\"\"\\t\"$2+451372872\"\\t\"$3+451372872\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr29\")print \"5D\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr30\")print \"5D\"\"\\t\"$2+451901030\"\\t\"$3+451901030\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr31\")print \"6A\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}' |awk '{if($1==\"chr32\")print \"6A\"\"\\t\"$2+452440856\"\\t\"$3+452440856\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr33\")print \"6B\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8; else print $0}'|awk '{if($1==\"chr34\")print \"6B\"\"\\t\"$2+452077197\"\\t\"$3+452077197\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr35\")print \"6D\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr36\")print \"6D\"\"\\t\"$2+450509124\"\\t\"$3+450509124\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr37\")print \"7A\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}' |awk '{if($1==\"chr38\")print \"7A\"\"\\t\"$2+450046986\"\\t\"$3+450046986\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr39\")print \"7B\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8; else print $0}'|awk '{if($1==\"chr40\")print \"7B\"\"\\t\"$2+453822637\"\\t\"$3+453822637\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr41\")print \"7D\"\"\\t\"$2\"\\t\"$3\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}'|awk '{if($1==\"chr42\")print \"7D\"\"\\t\"$2+453812268\"\\t\"$3+453812268\"\\t\"$4\"\\t\"$5\"\\t\"$6\"\\t\"$7\"\\t\"$8;else print $0}' >vmap2.1.vcf.bed");
+                
+//                    bw.newLine();
+                      
+//                bw.flush();
+//                bw.close();
             }
 
-        } catch (Exception e) {
-            System.out.println("Error in calling sample GERP!");
-            e.printStackTrace();
+//        } catch (Exception e) {
+//            System.out.println("Error in calling sample GERP!");
+//            e.printStackTrace();
 
         }
 
@@ -156,8 +96,7 @@ public class CommandPrinter {
 //System.out.println("mv "+i+j+".flt.beds "+i+j+".flt.bed");  
 //System.out.println("java -Xms400g -Xmx400g -jar gerpReformat.jar -f /data2/lipeng/msa/gerp/"+i+j+".flt.bed -m /data2/lipeng/msa/gerp/"+i+j+".sort.maf.gerp -o /data2/lipeng/msa/gerp/"+i+j+".gerp.wig -g "+j);
 //System.out.println("java -Xms200g -Xmx200g -jar PlantGenetics.jar -g /data2/lipeng/msa/gerp/"+i+j+".gerp.wig");
-    }
-}
+
 //   }  // 
 //}
 //(((orind,orniv),(orruf,orjap)),(orbar,orgla))))))leper)))
